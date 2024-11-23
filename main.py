@@ -16,3 +16,10 @@ print("Production at pos 2:", production_index)
 symbol = 'A'
 print(f"{symbol} is Non-Terminal:", grammar.isNonTerminal(symbol))
 print(f"{symbol} is Terminal:", grammar.isTerminal(symbol))
+
+print("First")
+print(grammar.FIRST)
+print("Follow")
+print(grammar.FOLLOW)
+print("Parse table")
+print(grammar.parseTable)

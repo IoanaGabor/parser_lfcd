@@ -4,6 +4,9 @@ class Grammar:
         self.E = E
         self.P = P
         self.S = S
+        self.FIRST = self.compute_first()
+        self.FOLLOW = self.compute_follow(self.FIRST)
+        self.parseTable = self.construct_parse_table(self.FIRST, self.FOLLOW)
 
     @staticmethod
     def validate(N, E, P, S):
@@ -30,7 +33,6 @@ class Grammar:
             E = Grammar.parseLine(file.readline())
             S = file.readline().split('=')[1].strip()
             P = Grammar.parseRules(Grammar.parseLine(''.join([line for line in file])))
-
             return Grammar(N, E, P, S)
 
     @staticmethod
@@ -79,3 +81,74 @@ class Grammar:
                + 'E = { ' + ', '.join(self.E) + ' }\n' \
                + 'P = { ' + ', '.join([' -> '.join(prod) for prod in self.P]) + ' }\n' \
                + 'S = ' + str(self.S) + '\n'
+    
+    def compute_first(self):
+        FIRST = {nt: set() for nt in self.N}
+        changed = True
+
+        while changed:
+            changed = False
+            for nt in self.N:
+                for prod, _ in self.P[nt]:
+                    for symbol in self.splitRhs(prod):
+                        if self.isTerminal(symbol):
+                            if symbol not in FIRST[nt]:
+                                FIRST[nt].add(symbol)
+                                changed = True
+                            break
+                        elif self.isNonTerminal(symbol):
+                            new_first = FIRST[symbol] - {'E'}
+                            if not new_first.issubset(FIRST[nt]):
+                                FIRST[nt].update(new_first)
+                                changed = True
+                            if 'E' not in FIRST[symbol]:
+                                break
+                        else:  # Epsilon
+                            if 'E' not in FIRST[nt]:
+                                FIRST[nt].add('E')
+                                changed = True
+        return FIRST
+
+    def compute_follow(self, FIRST):
+        FOLLOW = {nt: set() for nt in self.N}
+        FOLLOW[self.S].add('$')
+        changed = True
+
+        while changed:
+            changed = False
+            for nt in self.N:
+                for prod, _ in self.P[nt]:
+                    trailer = FOLLOW[nt].copy()
+                    for symbol in reversed(self.splitRhs(prod)):
+                        if self.isNonTerminal(symbol):
+                            if not trailer.issubset(FOLLOW[symbol]):
+                                FOLLOW[symbol].update(trailer)
+                                changed = True
+                            if 'E' in FIRST[symbol]:
+                                trailer.update(FIRST[symbol] - {'E'})
+                            else:
+                                trailer = FIRST[symbol]
+                        elif self.isTerminal(symbol):
+                            trailer = {symbol}
+                        else:  # Epsilon
+                            trailer = {'E'}
+        return FOLLOW
+    
+    def construct_parse_table(self, FIRST, FOLLOW):
+        parse_table = {nt: {t: "error" for t in self.E + ['$']} for nt in self.N}
+        parse_table.update({t: {t: "pop" for t in self.E + ['$']} for t in self.E})
+        parse_table['$'] = {t: "error" for t in self.E}
+        parse_table['$']['$'] = "acc"
+
+        for nt in self.N:
+            for prod, index in self.P[nt]:
+                rhs_symbols = self.splitRhs(prod)
+                if len(rhs_symbols) == 1 and rhs_symbols[0] in self.N:
+                    for symbol in FIRST[rhs_symbols[0]]:
+                        if symbol != 'E':
+                            parse_table[nt][symbol] = (prod, index)
+                        if 'E' in FIRST[rhs_symbols[0]]:
+                            for follow_symbol in FOLLOW[nt]:
+                                parse_table[nt][follow_symbol] = ('E', None)
+
+        return parse_table
