@@ -83,12 +83,15 @@ class Grammar:
     def compute_first(self):
         FIRST = {nt: set() for nt in self.N}
         changed = True
-
+        print("COMPUTING FIRST")
         while changed:
             changed = False
             for nt in self.N:
+                print(f"nt first {nt}")
                 for prod, _ in self.P[nt]:
+                    print(f"prod first {prod}")
                     for symbol in self.split_rhs(prod):
+                        print(f"symbol first {symbol}")
                         if self.is_terminal(symbol):
                             if symbol not in FIRST[nt]:
                                 FIRST[nt].add(symbol)
@@ -105,6 +108,7 @@ class Grammar:
                             if 'E' not in FIRST[nt]:
                                 FIRST[nt].add('E')
                                 changed = True
+                        print(f"FIRST at symbol {symbol}{FIRST}")
         return FIRST
 
     # def compute_follow(self, FIRST):
@@ -136,12 +140,16 @@ class Grammar:
         FOLLOW[self.S].add('$')
         changed = True
 
+        print("COMPUTING FOLLOW")
         while changed:
             changed = False
             for nt in self.N:
+                print(f"nt follow {nt}")
                 for prod, _ in self.P[nt]:
+                    print(f"prod follow {prod}")
                     trailer = FOLLOW[nt].copy()
                     for symbol in reversed(self.split_rhs(prod)):
+                        print(f"symbol follow {symbol}")
                         if self.is_non_terminal(symbol):
                             if not trailer.issubset(FOLLOW[symbol]):
                                 FOLLOW[symbol].update(trailer)
@@ -154,6 +162,7 @@ class Grammar:
                             trailer = {symbol}
                         else:  # Epsilon
                             trailer = {'E'}
+                        print(f"FOLLOW at symbol {symbol}{FIRST}")
         return FOLLOW
 
     # def construct_parse_table(self, FIRST, FOLLOW):
