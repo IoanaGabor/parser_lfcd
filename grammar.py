@@ -23,7 +23,11 @@ class Grammar:
 
     @staticmethod
     def parse_line(line: str) -> list[str]:
-        return [value.strip() for value in line.strip().split('=')[1].strip()[1:-1].strip().split(',')]
+        return [value.strip() for value in line.strip().split('=', 1)[1].strip()[1:-1].strip().split(',')]
+    
+    @staticmethod
+    def parse_line_in_productions(line: str) -> list[str]:
+        return [value.strip() for value in line.strip().strip().strip().split(',')]
 
     @staticmethod
     def from_file(fileName):
@@ -31,7 +35,8 @@ class Grammar:
             N = Grammar.parse_line(file.readline())
             E = Grammar.parse_line(file.readline())
             S = file.readline().split('=')[1].strip()
-            P = Grammar.parse_rules(Grammar.parse_line(''.join([line for line in file])))
+            file.readline()
+            P = Grammar.parse_rules(Grammar.parse_line_in_productions(''.join([line for line in file])))
             return Grammar(N, E, P, S)
 
     @staticmethod
@@ -61,6 +66,25 @@ class Grammar:
 
     def is_terminal(self, value):
         return value in self.E
+    
+    def get_terminals(self):
+        return self.E
+    
+    def get_nonterminals(self):
+        return self.N
+    
+    def get_productions(self):
+        return self.P
+    
+    def get_productions_for_nonterminal(self, nonterminal):
+        return self.P[nonterminal]
+
+    def is_context_free_grammar(self):
+        for lhs, _ in self.P.items():
+            # Check that LHS is a single non-terminal
+            if lhs not in self.N:
+                return False
+        return True
 
     def get_productions_for(self, nonTerminal):
         if not self.is_non_terminal(nonTerminal):
@@ -218,12 +242,12 @@ class Grammar:
                     if symbol != 'E':
                         parse_table[nt][symbol] = (prod, index)
 
-                print(f"parse table {parse_table}")
+                #print(f"parse table {parse_table}")
                 if 'E' in first_set:
                     for follow_symbol in FOLLOW[nt]:
-                        if parse_table[nt][follow_symbol] == "error":
+                        if follow_symbol in parse_table[nt] and parse_table[nt][follow_symbol] == "error":
                             parse_table[nt][follow_symbol] = ('E', None)
-                    print(f"parse table {parse_table}")
+                    #print(f"parse table {parse_table}")
         for t in self.E:
             parse_table[t] = {t: "pop" for t in self.E + ['$']}
         parse_table['$'] = {t: "error" for t in self.E}

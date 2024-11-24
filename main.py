@@ -16,33 +16,41 @@ def read_sequence(fname):
     return sequence.strip()
 
 def main():
-    file_name = 'g1.txt'
+    file_name = 'g2.txt'
     sequence_file = 'sequence.txt'
     grammar = Grammar.from_file(file_name)
 
     print(grammar)
+    print("Nonterminals")
+    print(grammar.get_nonterminals())
+    print("Terminals")
+    print(grammar.get_terminals())
+    print("Productions")
+    print(grammar.get_productions())
+    print("CFG check")
+    print(grammar.is_context_free_grammar())
     parser = Parser(grammar)
 
-    print("FIRST Set:", parser.firstSet)
-    print("FOLLOW Set:", parser.followSet)
+    # print("FIRST Set:", parser.firstSet)
+    # print("FOLLOW Set:", parser.followSet)
 
-    print("Parse Table:")
-    for k, v in parser.table.items():
-        print(f"{k} -> {v}")
+    # print("Parse Table:")
+    # for k, v in parser.table.items():
+    #     print(f"{k} -> {v}")
 
-    sequence = read_sequence(sequence_file)
-    print(f"Input Sequence: {sequence}")
-    result = parser.analyze_sequence(sequence)
+    # sequence = read_sequence(sequence_file)
+    # print(f"Input Sequence: {sequence}")
+    # result = parser.analyze_sequence(sequence)
 
-    if result is None:
-        print("Sequence not accepted.")
-    else:
-        print("Sequence accepted with result:", result)
+    # if result is None:
+    #     print("Sequence not accepted.")
+    # else:
+    #     print("Sequence accepted with result:", result)
 
-        tree = Tree(grammar)
-        tree.build(result.strip().split())
-        print("Parsing Tree:")
-        tree.print_table()
+    #     tree = Tree(grammar)
+    #     tree.build(result.strip().split())
+    #     print("Parsing Tree:")
+    #     tree.print_table()
 
 if __name__ == "__main__":
     main()
