@@ -1,25 +1,48 @@
 from grammar import Grammar
+from parsing_tree import Tree
+class Parser:
+    def __init__(self, grammar):
+        self.grammar = grammar
+        self.firstSet = grammar.FIRST
+        self.followSet = grammar.FOLLOW
+        self.table = grammar.parseTable
+    def analyze_sequence(self, sequence):
+        return self.grammar.analyzeSequence(sequence)
+def read_sequence(fname):
+    sequence = ""
+    with open(fname, 'r') as fin:
+        for line in fin.readlines():
+            sequence += line.strip() + " "
+    return sequence.strip()
 
-file_name = 'g1.txt'
-grammar = Grammar.fromFile(file_name)
+def main():
+    file_name = 'g1.txt'
+    sequence_file = 'sequence.txt'
+    grammar = Grammar.from_file(file_name)
 
-print(grammar)
+    print(grammar)
+    parser = Parser(grammar)
 
-print(Grammar.validate(grammar.N, grammar.E, grammar.P, grammar.S))
+    print("FIRST Set:", parser.firstSet)
+    print("FOLLOW Set:", parser.followSet)
 
-productions_S = grammar.getProductionsFor('S')
-print("Productions for S:", productions_S)
+    print("Parse Table:")
+    for k, v in parser.table.items():
+        print(f"{k} -> {v}")
 
-production_index = grammar.getProductionForIndex(2)
-print("Production at pos 2:", production_index)
+    sequence = read_sequence(sequence_file)
+    print(f"Input Sequence: {sequence}")
+    result = parser.analyze_sequence(sequence)
 
-symbol = 'A'
-print(f"{symbol} is Non-Terminal:", grammar.isNonTerminal(symbol))
-print(f"{symbol} is Terminal:", grammar.isTerminal(symbol))
+    if result is None:
+        print("Sequence not accepted.")
+    else:
+        print("Sequence accepted with result:", result)
 
-print("First")
-print(grammar.FIRST)
-print("Follow")
-print(grammar.FOLLOW)
-print("Parse table")
-print(grammar.parseTable)
+        tree = Tree(grammar)
+        tree.build(result.strip().split())
+        print("Parsing Tree:")
+        tree.print_table()
+
+if __name__ == "__main__":
+    main()

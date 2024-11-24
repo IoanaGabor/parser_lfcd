@@ -22,21 +22,21 @@ class Grammar:
         return True
 
     @staticmethod
-    def parseLine(line: str) -> list[str]:
+    def parse_line(line: str) -> list[str]:
         return [value.strip() for value in line.strip().split('=')[1].strip()[1:-1].strip().split(',')]
 
     @staticmethod
-    def fromFile(fileName):
+    def from_file(fileName):
 
         with open(fileName, 'r') as file:
-            N = Grammar.parseLine(file.readline())
-            E = Grammar.parseLine(file.readline())
+            N = Grammar.parse_line(file.readline())
+            E = Grammar.parse_line(file.readline())
             S = file.readline().split('=')[1].strip()
-            P = Grammar.parseRules(Grammar.parseLine(''.join([line for line in file])))
+            P = Grammar.parse_rules(Grammar.parse_line(''.join([line for line in file])))
             return Grammar(N, E, P, S)
 
     @staticmethod
-    def parseRules(rules):
+    def parse_rules(rules):
         result = {}
         index = 1
 
@@ -55,23 +55,23 @@ class Grammar:
 
         return result
 
-    def splitRhs(self, prod):
+    def split_rhs(self, prod):
         return prod.split(' ')
 
-    def isNonTerminal(self, value):
+    def is_non_terminal(self, value):
         return value in self.N
 
-    def isTerminal(self, value):
+    def is_terminal(self, value):
         return value in self.E
 
-    def getProductionsFor(self, nonTerminal):
-        if not self.isNonTerminal(nonTerminal):
+    def get_productions_for(self, nonTerminal):
+        if not self.is_non_terminal(nonTerminal):
             raise Exception('Can only show productions for non-terminals')
         for key in self.P.keys():
             if key == nonTerminal:
                 return self.P[key]
 
-    def getProductionForIndex(self, index):
+    def get_production_for_index(self, index):
         for key, value in self.P.items():
             for v in value:
                 if v[1] == index:
@@ -90,13 +90,13 @@ class Grammar:
             changed = False
             for nt in self.N:
                 for prod, _ in self.P[nt]:
-                    for symbol in self.splitRhs(prod):
-                        if self.isTerminal(symbol):
+                    for symbol in self.split_rhs(prod):
+                        if self.is_terminal(symbol):
                             if symbol not in FIRST[nt]:
                                 FIRST[nt].add(symbol)
                                 changed = True
                             break
-                        elif self.isNonTerminal(symbol):
+                        elif self.is_non_terminal(symbol):
                             new_first = FIRST[symbol] - {'E'}
                             if not new_first.issubset(FIRST[nt]):
                                 FIRST[nt].update(new_first)
@@ -119,8 +119,8 @@ class Grammar:
             for nt in self.N:
                 for prod, _ in self.P[nt]:
                     trailer = FOLLOW[nt].copy()
-                    for symbol in reversed(self.splitRhs(prod)):
-                        if self.isNonTerminal(symbol):
+                    for symbol in reversed(self.split_rhs(prod)):
+                        if self.is_non_terminal(symbol):
                             if not trailer.issubset(FOLLOW[symbol]):
                                 FOLLOW[symbol].update(trailer)
                                 changed = True
@@ -128,12 +128,12 @@ class Grammar:
                                 trailer.update(FIRST[symbol] - {'E'})
                             else:
                                 trailer = FIRST[symbol]
-                        elif self.isTerminal(symbol):
+                        elif self.is_terminal(symbol):
                             trailer = {symbol}
                         else:  # Epsilon
                             trailer = {'E'}
         return FOLLOW
-    
+
     def construct_parse_table(self, FIRST, FOLLOW):
         parse_table = {nt: {t: "error" for t in self.E + ['$']} for nt in self.N}
         parse_table.update({t: {t: "pop" for t in self.E + ['$']} for t in self.E})
@@ -142,7 +142,7 @@ class Grammar:
 
         for nt in self.N:
             for prod, index in self.P[nt]:
-                rhs_symbols = self.splitRhs(prod)
+                rhs_symbols = self.split_rhs(prod)
                 if len(rhs_symbols) == 1 and rhs_symbols[0] in self.N:
                     for symbol in FIRST[rhs_symbols[0]]:
                         if symbol != 'E':
@@ -150,5 +150,46 @@ class Grammar:
                         if 'E' in FIRST[rhs_symbols[0]]:
                             for follow_symbol in FOLLOW[nt]:
                                 parse_table[nt][follow_symbol] = ('E', None)
-
         return parse_table
+
+    def analyzeSequence(self, sequence):
+        w = self.split_rhs(sequence)
+        stack = [self.S, '$']
+        output = ""
+
+        while stack[0] != '$' and w:
+            print(w, stack)
+            if w[0] == stack[0]:
+                w = w[1:]
+                stack.pop(0)
+            else:
+                x = w[0]
+                a = stack[0]
+                if a not in self.parseTable or x not in self.parseTable[a]:
+                    return None
+                action = self.parseTable[a][x]
+                if isinstance(action, tuple):
+                    rhs, index = action
+                    rhs = self.split_rhs(rhs)
+                    for i in range(len(rhs) - 1, -1, -1):
+                        if rhs[i] != 'E':
+                            stack.insert(0, rhs[i])
+                    output += str(index) + " "
+                elif action == "error":
+                    return None
+                elif action == "pop":
+                    stack.pop(0)
+        if stack[0] == '$' and w:
+            return None
+
+        while stack[0] != '$':
+            a = stack[0]
+            if a in self.parseTable and '$' in self.parseTable[a]:
+                action = self.parseTable[a]['$']
+                if isinstance(action, tuple):
+                    rhs, index = action
+                    output += str(index) + " "
+            stack.pop(0)
+
+        return output
+
