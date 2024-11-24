@@ -16,8 +16,8 @@ class Tree:
         self.indexInTreeSequence = 1
 
     def build(self, ws):
-        print(ws)
-        print(len(ws))
+        # print(ws)
+        # print(len(ws))
         self.ws = ws
         nonterminal, rhs = self.grammar.get_production_for_index(int(self.ws[0]))
         self.root = Node(nonterminal, None, None)
@@ -33,22 +33,22 @@ class Tree:
         currentSymbol = currentTransition[0]
         if currentSymbol in self.grammar.E:  # Terminal
             node = Node(currentSymbol, None, None)
-            print("current value: " + node.value)
-            print("finished terminal branch")
+            # print("current value: " + node.value)
+            # print("finished terminal branch")
             node.right_sibling = self.build_recursive(currentTransition[1:])
             return node
         elif currentSymbol in self.grammar.N:  # Non-terminal
             transitionNumber = self.ws[self.indexInTreeSequence]
             _, production = self.grammar.get_production_for_index(int(transitionNumber))
             node = Node(currentSymbol, None, None)
-            print("current value: " + node.value)
-            print("finished nonterminal branch")
+            # print("current value: " + node.value)
+            # print("finished nonterminal branch")
             self.indexInTreeSequence += 1
             node.child = self.build_recursive(self.grammar.split_rhs(production))
             node.right_sibling = self.build_recursive(currentTransition[1:])
             return node
         else:  # Handle epsilon
-            print('E branch')
+            # print('E branch')
             return Node("E", None, None)
 
     def print_table(self):
@@ -57,7 +57,7 @@ class Tree:
     def bfs(self, node, father_crt=None, left_sibling_crt=None):
         if node is None:
             return []
-        print("{} | {} | {} | {}".format(self.crt, node.value, father_crt, left_sibling_crt))
+        #print("{} | {} | {} | {}".format(self.crt, node.value, father_crt, left_sibling_crt))
         crt = self.crt
         self.crt += 1
         if left_sibling_crt is not None:

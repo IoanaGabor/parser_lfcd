@@ -1,0 +1,25 @@
+N = { Program, Declaration, CompoundStmt, StmtList, Stmt, SimplStmt, StructStmt, AssignStmt, Expression, Condition, NumericExpression, NumericTerm, LogicalExpression, LogicalTerm, Term, IOStmt, IfStmt, WhileStmt, ForStmt, Type }
+E = { utama, (, ), {, }, ;, =, +, -, *, /, %, ==, !=, <, <=, >, >=, &&, ||, Maca, Nulis, Yen, Liyane, Nalika, Kanggo, identifier, int_cstnt, real_cstnt, bool_cstnt, string_cstnt }
+S = Program
+P = {
+    Program -> utama ( ) { CompoundStmt },
+    Declaration -> Type identifier ;,
+    Type -> String | Char | Integer | Real | Array [ int ] # Type,
+    CompoundStmt -> StmtList,
+    StmtList -> Stmt ; StmtList | Stmt,
+    Stmt -> SimplStmt | StructStmt,
+    SimplStmt -> AssignStmt | IOStmt,
+    StructStmt -> CompoundStmt | IfStmt | WhileStmt | ForStmt,
+    AssignStmt -> identifier = Expression | identifier [ int_cstnt ] = Expression,
+    Expression -> NumericExpression | LogicalExpression | identifier [ int_cstnt ],
+    Condition -> Expression comparison_operator Expression,
+    IfStmt -> Yen ( Condition ) { Stmt } | Yen ( Condition ) { Stmt } Liyane { Stmt },
+    WhileStmt -> Nalika ( Condition ) { Stmt },
+    ForStmt -> Kanggo ( Condition ; Condition ; Condition ) { Stmt },
+    NumericExpression -> NumericTerm { arithmetic_operator NumericTerm },
+    NumericTerm -> int_cstnt | real_cstnt | identifier | ( NumericExpression ) | identifier [ int_cstnt ],
+    LogicalExpression -> LogicalTerm { logical_operator LogicalTerm },
+    LogicalTerm -> bool_cstnt | identifier | ( LogicalExpression ) | identifier [ int_cstnt ],
+    Term -> bool_cstnt | string_cstnt | int_cstnt | real_cstnt | identifier | ( Expression ) | identifier [ int_cstnt ],
+    IOStmt -> Maca identifier ; | Nulis identifier ;
+}
