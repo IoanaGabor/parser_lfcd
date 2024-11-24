@@ -27,7 +27,6 @@ class Grammar:
 
     @staticmethod
     def from_file(fileName):
-
         with open(fileName, 'r') as file:
             N = Grammar.parse_line(file.readline())
             E = Grammar.parse_line(file.readline())
@@ -41,17 +40,16 @@ class Grammar:
         index = 1
 
         for rule in rules:
-            print(rule)
             lhs, rhs = rule.split('->')
             lhs = lhs.strip()
             rhs = [value.strip() for value in rhs.split('|')]
 
             for value in rhs:
                 if lhs in result.keys():
-                    result[lhs].append((value,index))
+                    result[lhs].append((value, index))
                 else:
-                    result[lhs] = [(value,index)]
-                index+=1
+                    result[lhs] = [(value, index)]
+                index += 1
 
         return result
 
@@ -158,28 +156,37 @@ class Grammar:
         output = ""
 
         while stack[0] != '$' and w:
-            print(w, stack)
+            print(f"Input Sequence: {w}")
+            print(f"Stack: {stack}")
+
             if w[0] == stack[0]:
+                print(f"Action: Match terminal '{w[0]}'")
                 w = w[1:]
                 stack.pop(0)
             else:
                 x = w[0]
                 a = stack[0]
                 if a not in self.parseTable or x not in self.parseTable[a]:
+                    print(f"Action: Error - No rule for stack top '{a}' and input '{x}'")
                     return None
                 action = self.parseTable[a][x]
                 if isinstance(action, tuple):
                     rhs, index = action
                     rhs = self.split_rhs(rhs)
+                    print(f"Action: Expand '{a}' using production {a} -> {' '.join(rhs)}")
                     for i in range(len(rhs) - 1, -1, -1):
                         if rhs[i] != 'E':
                             stack.insert(0, rhs[i])
                     output += str(index) + " "
                 elif action == "error":
+                    print(f"Action: Error - Invalid input '{x}'")
                     return None
                 elif action == "pop":
+                    print(f"Action: Pop '{a}' from stack")
                     stack.pop(0)
+
         if stack[0] == '$' and w:
+            print("Action: Error - Input not fully consumed")
             return None
 
         while stack[0] != '$':
@@ -188,8 +195,12 @@ class Grammar:
                 action = self.parseTable[a]['$']
                 if isinstance(action, tuple):
                     rhs, index = action
+                    print(f"Action: Expand '{a}' using production {a} -> {' '.join(self.split_rhs(rhs))}")
                     output += str(index) + " "
             stack.pop(0)
 
+        print("Action: Accept - Parsing completed successfully")
         return output
+
+
 
