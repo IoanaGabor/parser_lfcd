@@ -166,10 +166,14 @@ class Grammar:
             else:
                 x = w[0]
                 a = stack[0]
+                print("A")
+                print(a)
                 if a not in self.parseTable or x not in self.parseTable[a]:
                     print(f"Action: Error - No rule for stack top '{a}' and input '{x}'")
                     return None
                 action = self.parseTable[a][x]
+                print("ACTION")
+                print(action)
                 if isinstance(action, tuple):
                     rhs, index = action
                     rhs = self.split_rhs(rhs)
