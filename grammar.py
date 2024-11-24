@@ -107,6 +107,30 @@ class Grammar:
                                 changed = True
         return FIRST
 
+    # def compute_follow(self, FIRST):
+    #     FOLLOW = {nt: set() for nt in self.N}
+    #     FOLLOW[self.S].add('$')
+    #     changed = True
+    #
+    #     while changed:
+    #         changed = False
+    #         for nt in self.N:
+    #             for prod, _ in self.P[nt]:
+    #                 trailer = FOLLOW[nt].copy()
+    #                 for symbol in reversed(self.split_rhs(prod)):
+    #                     if self.is_non_terminal(symbol):
+    #                         if not trailer.issubset(FOLLOW[symbol]):
+    #                             FOLLOW[symbol].update(trailer)
+    #                             changed = True
+    #                         if 'E' in FIRST[symbol]:
+    #                             trailer.update(FIRST[symbol] - {'E'})
+    #                         else:
+    #                             trailer = FIRST[symbol]
+    #                     elif self.is_terminal(symbol):
+    #                         trailer = {symbol}
+    #                     else:  # Epsilon
+    #                         trailer = {'E'}
+    #     return FOLLOW
     def compute_follow(self, FIRST):
         FOLLOW = {nt: set() for nt in self.N}
         FOLLOW[self.S].add('$')
@@ -125,29 +149,76 @@ class Grammar:
                             if 'E' in FIRST[symbol]:
                                 trailer.update(FIRST[symbol] - {'E'})
                             else:
-                                trailer = FIRST[symbol]
+                                trailer = FIRST[symbol].copy()
                         elif self.is_terminal(symbol):
                             trailer = {symbol}
                         else:  # Epsilon
                             trailer = {'E'}
         return FOLLOW
 
+    # def construct_parse_table(self, FIRST, FOLLOW):
+    #     parse_table = {nt: {t: "error" for t in self.E + ['$']} for nt in self.N}
+    #
+    #     for nt in self.N:
+    #         for prod, index in self.P[nt]:
+    #             rhs_symbols = self.split_rhs(prod)
+    #             first_set = set()
+    #
+    #             if self.is_non_terminal(rhs_symbols[0]):
+    #                 first_set = FIRST[rhs_symbols[0]]
+    #             elif self.is_terminal(rhs_symbols[0]):
+    #                 first_set = {rhs_symbols[0]}
+    #             elif rhs_symbols[0] == 'E':
+    #                 first_set = {'E'}
+    #
+    #             for symbol in first_set:
+    #                 if symbol != 'E':
+    #                     parse_table[nt][symbol] = (prod, index)
+    #
+    #             if 'E' in first_set:
+    #                 for follow_symbol in FOLLOW[nt]:
+    #                     parse_table[nt][follow_symbol] = ('E', None)
+    #     for t in self.E:
+    #         parse_table[t] = {t: "pop" for t in self.E + ['$']}
+    #     parse_table['$'] = {t: "error" for t in self.E}
+    #     parse_table['$']['$'] = "acc"
+    #
+    #     return parse_table
     def construct_parse_table(self, FIRST, FOLLOW):
         parse_table = {nt: {t: "error" for t in self.E + ['$']} for nt in self.N}
-        parse_table.update({t: {t: "pop" for t in self.E + ['$']} for t in self.E})
+        for nt in self.N:
+            print(f"NT {nt}")
+            print(f"PNT {self.P[nt]}")
+            for prod, index in self.P[nt]:
+                print(f"prod {prod}")
+                print(f"index {index}")
+                rhs_symbols = self.split_rhs(prod)
+                print(f"rhs symbols {rhs_symbols}")
+                first_set = set()
+
+                if self.is_non_terminal(rhs_symbols[0]):
+                    first_set = FIRST[rhs_symbols[0]]
+                elif self.is_terminal(rhs_symbols[0]):
+                    first_set = {rhs_symbols[0]}
+                elif rhs_symbols[0] == 'E':
+                    first_set = {'E'}
+
+                print(f"first set {first_set}")
+
+                for symbol in first_set:
+                    if symbol != 'E':
+                        parse_table[nt][symbol] = (prod, index)
+
+                print(f"parse table {parse_table}")
+                if 'E' in first_set:
+                    for follow_symbol in FOLLOW[nt]:
+                        if parse_table[nt][follow_symbol] == "error":
+                            parse_table[nt][follow_symbol] = ('E', None)
+                    print(f"parse table {parse_table}")
+        for t in self.E:
+            parse_table[t] = {t: "pop" for t in self.E + ['$']}
         parse_table['$'] = {t: "error" for t in self.E}
         parse_table['$']['$'] = "acc"
-
-        for nt in self.N:
-            for prod, index in self.P[nt]:
-                rhs_symbols = self.split_rhs(prod)
-                if len(rhs_symbols) == 1 and rhs_symbols[0] in self.N:
-                    for symbol in FIRST[rhs_symbols[0]]:
-                        if symbol != 'E':
-                            parse_table[nt][symbol] = (prod, index)
-                        if 'E' in FIRST[rhs_symbols[0]]:
-                            for follow_symbol in FOLLOW[nt]:
-                                parse_table[nt][follow_symbol] = ('E', None)
         return parse_table
 
     def analyzeSequence(self, sequence):
@@ -166,14 +237,13 @@ class Grammar:
             else:
                 x = w[0]
                 a = stack[0]
-                print("A")
-                print(a)
+                print(f"A {a}")
+                print(f"X {x}")
                 if a not in self.parseTable or x not in self.parseTable[a]:
                     print(f"Action: Error - No rule for stack top '{a}' and input '{x}'")
                     return None
                 action = self.parseTable[a][x]
-                print("ACTION")
-                print(action)
+                print(f"ACTION {action}")
                 if isinstance(action, tuple):
                     rhs, index = action
                     rhs = self.split_rhs(rhs)
