@@ -3,7 +3,8 @@ E = { (, ), +, *, int }
 S = S
 P = {
     S -> A B,
-    A -> ( S ) | int,
+    A -> ( S ) | int | E,
     B -> + A B | E,
     C -> * A C | E
 }
+
