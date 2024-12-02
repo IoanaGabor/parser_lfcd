@@ -1,7 +1,7 @@
-N = { S, A, B, C }
-E = { (, ), +, *, int }
-S = S
-P = {
+N ~ { S, A, B, C }
+E ~ { (, ), +, *, int }
+S ~ S
+P ~ {
     S -> A B,
     A -> ( S ) | int | E,
     B -> + A B | E,

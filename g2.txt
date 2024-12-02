@@ -1,25 +1,27 @@
-N = { Program, Declaration, CompoundStmt, StmtList, Stmt, SimplStmt, StructStmt, AssignStmt, Expression, Condition, NumericExpression, NumericTerm, LogicalExpression, LogicalTerm, Term, IOStmt, IfStmt, WhileStmt, ForStmt, Type }
-E = { utama, (, ), {, }, ;, =, +, -, *, /, %, ==, !=, <, <=, >, >=, &&, ||, Maca, Nulis, Yen, Liyane, Nalika, Kanggo, identifier, int_cstnt, real_cstnt, bool_cstnt, string_cstnt }
-S = Program
-P = {
-    Program -> utama ( ) { CompoundStmt },
+N ~ { Program, Declaration, int_cstnt, real_cstnt, bool_cstnt, string_cstnt, comparison_operator, CpdStmt, identifier, CompoundStmt, StmtList, Stmt, SimplStmt, StructStmt, AssignStmt, Expression, Condition, NumericExpression, NumericTerm, LogicalExpression, LogicalTerm, Term, IOStmt, IfStmt, WhileStmt, ForStmt, Type, TypeRest, CompoundStmtRest, NumericExpressionRest, LogicalExpressionRest, ExpressionRest, IfStmtRest }
+E ~ { utama, String, Char, Integer, Real, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, (, ), {, }, ;, +, -, *, /, %, ==, !=, <, <=, >, >=, &&, ||, Maca, Nulis, Yen, Liyane, Nalika, Kanggo, = }
+S ~ Program
+P ~ {
+    Program -> utama ( ) CpdStmt,
+    CpdStmt -> { CompoundStmt },
     Declaration -> Type identifier ;,
-    Type -> String | Char | Integer | Real | Array [ int ] # Type,
-    CompoundStmt -> StmtList,
-    StmtList -> Stmt ; StmtList | Stmt,
+    Type -> String | Char | Integer | Real,
+    CompoundStmt -> Stmt CompoundStmtRest,
+    CompoundStmtRest -> CompoundStmt | E,
     Stmt -> SimplStmt | StructStmt,
-    SimplStmt -> AssignStmt | IOStmt,
-    StructStmt -> CompoundStmt | IfStmt | WhileStmt | ForStmt,
-    AssignStmt -> identifier = Expression | identifier [ int_cstnt ] = Expression,
-    Expression -> NumericExpression | LogicalExpression | identifier [ int_cstnt ],
+    SimplStmt -> Declaration | AssignStmt | IOStmt,
+    StructStmt -> IfStmt | WhileStmt | ForStmt,
+    AssignStmt -> identifier = Expression ;,
+    Expression -> Term ExpressionRest,
     Condition -> Expression comparison_operator Expression,
-    IfStmt -> Yen ( Condition ) { Stmt } | Yen ( Condition ) { Stmt } Liyane { Stmt },
+    IfStmt -> Yen ( Condition ) { Stmt } IfStmtRest,
+    IfStmtRest -> Liyane { Stmt } | E,
     WhileStmt -> Nalika ( Condition ) { Stmt },
     ForStmt -> Kanggo ( Condition ; Condition ; Condition ) { Stmt },
-    NumericExpression -> NumericTerm { arithmetic_operator NumericTerm },
-    NumericTerm -> int_cstnt | real_cstnt | identifier | ( NumericExpression ) | identifier [ int_cstnt ],
-    LogicalExpression -> LogicalTerm { logical_operator LogicalTerm },
-    LogicalTerm -> bool_cstnt | identifier | ( LogicalExpression ) | identifier [ int_cstnt ],
-    Term -> bool_cstnt | string_cstnt | int_cstnt | real_cstnt | identifier | ( Expression ) | identifier [ int_cstnt ],
-    IOStmt -> Maca identifier ; | Nulis identifier ;
+    ExpressionRest -> comparison_operator Term ExpressionRest | E,
+    Term -> bool_cstnt | string_cstnt | int_cstnt | identifier,
+    IOStmt -> Maca identifier ; | Nulis identifier ;,
+    identifier -> a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v | w | x | y | z,
+    comparison_operator -> < | > | <= | >= | ==,
+    int_cstnt -> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 }

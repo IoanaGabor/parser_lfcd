@@ -21,7 +21,7 @@ class Grammar:
 
     @staticmethod
     def parse_line(line):
-        return [value.strip() for value in line.strip().split('=')[1].strip()[1:-1].strip().split(',')]
+        return [value.strip() for value in line.strip().split('~', 2)[1].strip()[1:-1].strip().split(',')]
 
     @staticmethod
     def from_file(file_name):
@@ -29,7 +29,7 @@ class Grammar:
         with open(file_name, 'r', encoding='utf-8') as file:
             N = Grammar.parse_line(file.readline())
             E = Grammar.parse_line(file.readline())
-            S = file.readline().split('=')[1].strip()
+            S = file.readline().split('~')[1].strip()
             P = Grammar.parse_rules(Grammar.parse_line(''.join([line for line in file])))
 
             return Grammar(N, E, P, S)

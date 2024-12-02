@@ -2,7 +2,6 @@ from copy import deepcopy
 
 
 class Parser:
-
     def __init__(self, grammar):
         self.grammar = grammar
         self.first_set = {i: set() for i in self.grammar.N}
@@ -123,6 +122,7 @@ class Parser:
                             self.table[pair] = v
                         else:
                             print(pair)
+                            print(self.first_set[rule[0]])
                             print("Grammar is not LL(1).")
                             assert False
                     else:
