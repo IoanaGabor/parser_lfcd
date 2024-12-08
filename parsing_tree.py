@@ -57,7 +57,10 @@ class Tree:
     def _bfs(self, node, father_crt=None, left_sibling_crt=None):
         if node is None:
             return []
-        print("{} | {} | {} | {}".format(self.crt, node.value, father_crt, left_sibling_crt))
+        output = "{} | {} | {} | {}".format(self.crt, node.value, father_crt, left_sibling_crt)
+        print(output)
+        with open("output.txt", "a") as file:
+                file.write(output + "\n")
 
         crt = self.crt
         self.crt += 1

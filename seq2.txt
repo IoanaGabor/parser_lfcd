@@ -1,1 +1,1 @@
-utama ( ) { Integer x ; x = 5 ; y = 7 ; Yen ( x == y ) { Maca x ; } Liyane { Nulis y ; } }
+utama ( ) { Integer identifier ; identifier = int_cstnt ; identifier = int_cstnt ; Yen ( identifier == int_cstnt ) { Maca identifier ; } Liyane { Nulis identifier ; } }

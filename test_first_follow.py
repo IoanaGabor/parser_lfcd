@@ -9,31 +9,32 @@ class Grammar:
         self.S = S
         self.P = P
 
-    def isNonTerminal(self, symbol):
+    def is_non_terminal(self, symbol):
         return symbol in self.N
 
-    def splitRhs(self, rhs):
+    def split_rhs(self, rhs):
         return rhs.split()
 
 
 class TestFirstFollow(unittest.TestCase):
     def setUp(self):
         self.grammar = Grammar(
-            N={"program", "statement", "statement_list", "compound_statement", "expression",
+            N=["program", "statement", "statement_list", "statement_list_rest", "compound_statement", "expression",
                "term", "factor", "iostmt", "simple_type", "array_declaration",
                "declaration_stmt", "assignment_statement", "if_statement",
                "while_statement", "return_statement", "for_statement", "for_header",
-               "condition", "relation"},
-            E={"begin", "(", ")", "{", "}", ";", "+", "-", "*", "/", "%", "<", "<=", ">",
+               "condition", "relation"],
+            E=["begin", "(", ")", "{", "}", ";", "+", "-", "*", "/", "%", "<", "<=", ">",
                ">=", "and", "or", "read", "show", "if", "elif", "else", "while", "becomes",
-               "eq", "diff", "int", "float", "string", "stop"},
+               "eq", "diff", "int", "float", "string", "stop"],
             S="program",
             P={
                 "program": [("begin compound_statement stop", 0)],
                 "statement": [("declaration_stmt", 1), ("assignment_statement", 2),
                               ("if_statement", 3), ("while_statement", 4),
                               ("return_statement", 5), ("for_statement", 6), ("iostmt", 7)],
-                "statement_list": [("statement", 8), ("statement ; statement_list", 9)],
+                "statement_list": [("statement statement_list_rest", 8)],
+                "statement_list_rest": [("statement_list", 44), ("E", 45)],
                 "compound_statement": [("{ statement_list }", 10)],
                 "expression": [("expression + term", 11), ("expression - term", 12),
                                ("term", 13)],
@@ -60,10 +61,9 @@ class TestFirstFollow(unittest.TestCase):
         self.parser = Parser(self.grammar)
 
     def test_first_set(self):
-        # Convert sets to sorted lists for comparison
         expected_first = {
             "program": {"begin"},
-            "statement": {"int", "string", "float", "IDENTIFIER", "if", "while", "return", "for", "read", "show"},
+            "statement": {"int", "string", "float", "IDENTIFIER", "if", "while", "return", "for", "read", "show", "array"},
             "expression": {"(", "IDENTIFIER", "CONST"},
             "term": {"(", "IDENTIFIER", "CONST"},
             "factor": {"(", "IDENTIFIER", "CONST"},
@@ -71,20 +71,19 @@ class TestFirstFollow(unittest.TestCase):
         }
         for non_terminal, expected in expected_first.items():
             with self.subTest(non_terminal=non_terminal):
-                self.assertEqual(set(self.parser.firstSet[non_terminal]), expected)
+                self.assertEqual(set(self.parser.first_set[non_terminal]), expected)
 
     def test_follow_set(self):
-        # Convert sets to sorted lists for comparison
         expected_follow = {
-            "program": {"$"},
-            "statement": {";", "}"},
-            "expression": {")", ";", "+", "-", "<", "<=", ">", ">=", "eq", "diff"},
-            "term": {"+", "-", ")", ";", "<", "<=", ">", ">=", "eq", "diff"},
-            "factor": {"*", "/", "%", "+", "-", ")", ";", "<", "<=", ">", ">=", "eq", "diff"},
+            "program": {"E"},
+            "statement": {"}", 'while', 'for', 'string','IDENTIFIER','read','array','int','float','show','if','return'},
+            "expression": {")", ";", "+", "-", "<", "<=", ">", ">=", "eq", "diff", "}", 'while', 'for', 'string','IDENTIFIER','read','array','int','float','show','if','return'},
+            "term": {"+", "-", ")", ";", "<", "<=", ">", ">=", "eq", "diff", "*", "%", "/", "}", 'while', 'for', 'string','IDENTIFIER','read','array','int','float','show','if','return'},
+            "factor": {"*", "/", "%", "+", "-", ")", ";", "<", "<=", ">", ">=", "eq", "diff", "}", 'while', 'for', 'string','IDENTIFIER','read','array','int','float','show','if','return'},
         }
         for non_terminal, expected in expected_follow.items():
             with self.subTest(non_terminal=non_terminal):
-                self.assertEqual(set(self.parser.followSet[non_terminal]), expected)
+                self.assertEqual(set(self.parser.follow_set[non_terminal]), expected)
 
 
 if __name__ == "__main__":

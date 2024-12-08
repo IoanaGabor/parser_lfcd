@@ -1,5 +1,5 @@
-N ~ { Program, Declaration, int_cstnt, real_cstnt, bool_cstnt, string_cstnt, comparison_operator, CpdStmt, identifier, CompoundStmt, StmtList, Stmt, SimplStmt, StructStmt, AssignStmt, Expression, Condition, NumericExpression, NumericTerm, LogicalExpression, LogicalTerm, Term, IOStmt, IfStmt, WhileStmt, ForStmt, Type, TypeRest, CompoundStmtRest, NumericExpressionRest, LogicalExpressionRest, ExpressionRest, IfStmtRest }
-E ~ { utama, String, Char, Integer, Real, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, (, ), {, }, ;, +, -, *, /, %, ==, !=, <, <=, >, >=, &&, ||, Maca, Nulis, Yen, Liyane, Nalika, Kanggo, = }
+N ~ { Program, Declaration, real_cstnt, bool_cstnt, string_cstnt, comparison_operator, CpdStmt, CompoundStmt, StmtList, Stmt, SimplStmt, StructStmt, AssignStmt, Expression, Condition, NumericExpression, NumericTerm, LogicalExpression, LogicalTerm, Term, IOStmt, IfStmt, WhileStmt, ForStmt, Type, TypeRest, CompoundStmtRest, NumericExpressionRest, LogicalExpressionRest, ExpressionRest, IfStmtRest }
+E ~ { utama, String, Char, Integer, Real,int_cstnt,identifier, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, (, ), {, }, ;, +, -, *, /, %, ==, !=, <, <=, >, >=, &&, ||, Maca, Nulis, Yen, Liyane, Nalika, Kanggo, = }
 S ~ Program
 P ~ {
     Program -> utama ( ) CpdStmt,
@@ -21,7 +21,5 @@ P ~ {
     ExpressionRest -> comparison_operator Term ExpressionRest | E,
     Term -> bool_cstnt | string_cstnt | int_cstnt | identifier,
     IOStmt -> Maca identifier ; | Nulis identifier ;,
-    identifier -> a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v | w | x | y | z,
-    comparison_operator -> < | > | <= | >= | ==,
-    int_cstnt -> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+    comparison_operator -> < | > | <= | >= | ==
 }
