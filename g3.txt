@@ -1,24 +1,24 @@
-N = { program, statement, statement_list, compound_statement, expression, term, factor, iostmt, simple_type, array_declaration, declaration_stmt, assignment_statement, if_statement, while_statement, return_statement, for_statement, for_header, condition, relation }
-E = { begin, (, ), {, }, ;, +, -, *, /, %, <, <=, >, >=, and, or, read, show, if, elif, else, while, becomes, eq, diff, int, float, string, stop }
-S = program
-P = {
-    program -> "begin" compound_statement "stop",
+N ~ { program, statement, statement_list, compound_statement, expression, term, factor, iostmt, simple_type, array_declaration, declaration_stmt, assignment_statement, if_statement, while_statement, return_statement, for_statement, for_header, condition, relation }
+E ~ { begin, (, ), {, }, ;, +, -, *, /, %, <, <=, >, >=, and, or, read, show, if, elif, else, while, becomes, eq, diff, int, float, string, stop }
+S ~ program
+P ~ {
+    program -> begin compound_statement stop,
     statement -> declaration_stmt | assignment_statement | if_statement | while_statement | return_statement | for_statement | iostmt,
-    statement_list -> statement | statement ";" statement_list,
-    compound_statement -> "{" statement_list "}",
+    statement_list -> statement | statement ; statement_list,
+    compound_statement -> { statement_list },
     expression -> expression + term | expression - term | term,
     term -> term * factor | term / factor | term % factor | factor,
-    factor -> "(" expression ")" | IDENTIFIER | CONST,
-    iostmt -> "read" "(" IDENTIFIER ")" | "show" "(" IDENTIFIER ")" | "show" "(" CONST ")",
-    simple_type -> "int" | "string" | "float",
-    array_declaration -> "array" simple_type IDENTIFIER "[" "]",
+    factor -> ( expression ) | IDENTIFIER | CONST,
+    iostmt -> read ( IDENTIFIER ) | show ( IDENTIFIER ) | show ( CONST ),
+    simple_type -> int | string | float,
+    array_declaration -> array simple_type IDENTIFIER [ ],
     declaration_stmt -> simple_type IDENTIFIER | array_declaration,
-    assignment_statement -> IDENTIFIER "becomes" expression,
-    if_statement -> "if" "(" condition ")" compound_statement | "if" "(" condition ")" compound_statement "else" compound_statement,
-    while_statement -> "while" "(" condition ")" compound_statement,
-    return_statement -> "return" expression,
-    for_statement -> "for" for_header compound_statement,
-    for_header -> "(" "int" assignment_statement ";" condition ";" assignment_statement ")",
+    assignment_statement -> IDENTIFIER becomes expression,
+    if_statement -> if ( condition ) compound_statement | if ( condition ) compound_statement else compound_statement,
+    while_statement -> while ( condition ) compound_statement,
+    return_statement -> return expression,
+    for_statement -> for for_header compound_statement,
+    for_header -> ( int assignment_statement ; condition ; assignment_statement ),
     condition -> expression relation expression,
-    relation -> "<" | "<=" | "eq" | "diff" | ">=" | ">"
+    relation -> < | <= | eq | diff | >= | >
 }

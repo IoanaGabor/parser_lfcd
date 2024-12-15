@@ -1,0 +1,44 @@
+ Grammar -a context-free grammar and provides utilities to parse, validate, and manipulate the grammar.
+-N: A list of non-terminal symbols
+-E: A list of terminal symbols
+-P: A dictionary of productions where each non-terminal has associated production rules
+-S: Start symbol of the grammar
+
+-validate(N, E, P, S): Validates if a given grammar is correct based on certain conditions.
+-parse_line(line): Parses a line of text representing a list of values separated by commas.
+-from_file(file_name): Loads a grammar from a file and returns a Grammar object.
+-parse_rules(rules): Parses production rules and stores them in a dictionary format.
+-split_rhs(prod): Splits the right-hand side of a production into individual symbols.
+-is_non_terminal(value): Checks if a value is a non-terminal symbol.
+-is_terminal(value): Checks if a value is a terminal symbol.
+-get_productions_for(non_terminal): Returns all production rules for a given non-terminal.
+-get_production_for_index(index): Retrieves a production rule based on its index.
+
+Parser -implements an LL(1) parser for a given grammar, generating first and follow sets, creating a parsing table, and evaluating input sequences.
+-grammar: The grammar object to be parsed.
+-first_set: A dictionary storing the first set for each non-terminal.
+-follow_set: A dictionary storing the follow set for each non-terminal.
+-table: A parsing table for LL(1) parsing.
+
+-inner_loop(initial_set, items, additional_set): Processing items in the first or follow sets generation.
+-generate_first(): Generates the first sets for all non-terminals.
+-generate_follow(): Generates the follow sets for all non-terminals.
+-generate_table(): Generates the parsing table based on the first and follow sets.
+-evaluate_sequence(sequence): Evaluates an input sequence based on the grammar and parsing table, returning a sequence of production indices.
+
+Node -represents a node in a parse tree. It stores the value of the symbol, its children, and its right sibling.
+-value: The value of the symbol (non-terminal or terminal).
+-child: The child node in the parse tree.
+-right_sibling: The right sibling of the current node in the parse tree.
+
+Tree -represents a parse tree generated during the parsing process
+-root: The root node of the parse tree.
+-grammar: The grammar object used for parsing.
+-crt: A counter for node numbering.
+-ws: The current sequence of production rule indices.
+-index_in_tree_sequence: The current index in the tree-building sequence.
+
+-build(self, ws): Builds the parse tree from a given sequence of production rule indices.
+-_build_recursive(self, current_transition): Recursively builds the tree starting from the root node.
+-print_table(self): Prints the table of parse tree nodes using a breadth-first search.
+-_bfs(self, node, father_crt=None, left_sibling_crt=None): Performs a breadth-first search of the tree and prints the nodes.
