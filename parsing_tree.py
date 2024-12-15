@@ -17,8 +17,6 @@ class Tree:
         self.index_in_tree_sequence = 1
 
     def build(self, ws):
-        print(ws)
-        print(len(ws))
         self.ws = ws
         non_terminal, rhs = self.grammar.get_production_for_index(int(self.ws[0]))
         self.root = Node(non_terminal, None, None)

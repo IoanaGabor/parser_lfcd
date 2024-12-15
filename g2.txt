@@ -1,25 +1,25 @@
 N ~ { Program, Declaration, real_cstnt, bool_cstnt, string_cstnt, comparison_operator, CpdStmt, CompoundStmt, StmtList, Stmt, SimplStmt, StructStmt, AssignStmt, Expression, Condition, NumericExpression, NumericTerm, LogicalExpression, LogicalTerm, Term, IOStmt, IfStmt, WhileStmt, ForStmt, Type, TypeRest, CompoundStmtRest, NumericExpressionRest, LogicalExpressionRest, ExpressionRest, IfStmtRest }
-E ~ { utama, String, Char, Integer, Real,int_cstnt,identifier, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, (, ), {, }, ;, +, -, *, /, %, ==, !=, <, <=, >, >=, &&, ||, Maca, Nulis, Yen, Liyane, Nalika, Kanggo, = }
+E ~ { utama, string, char, integer, real,int_cstnt,identifier, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, (, ), {, }, ;, +, -, *, /, %, ==, !=, <, <=, >, >=, &&, ||, maca, nulis, yen, liyane, nalika, kanggo, = }
 S ~ Program
 P ~ {
     Program -> utama ( ) CpdStmt,
     CpdStmt -> { CompoundStmt },
     Declaration -> Type identifier ;,
-    Type -> String | Char | Integer | Real,
+    Type -> string | char | integer | real,
     CompoundStmt -> Stmt CompoundStmtRest,
     CompoundStmtRest -> CompoundStmt | E,
-    Stmt -> SimplStmt | StructStmt,
-    SimplStmt -> Declaration | AssignStmt | IOStmt,
+    Stmt -> SimplStmt  | StructStmt ,
+    SimplStmt -> IOStmt | Declaration | AssignStmt ,
     StructStmt -> IfStmt | WhileStmt | ForStmt,
     AssignStmt -> identifier = Expression ;,
     Expression -> Term ExpressionRest,
     Condition -> Expression comparison_operator Expression,
-    IfStmt -> Yen ( Condition ) { Stmt } IfStmtRest,
-    IfStmtRest -> Liyane { Stmt } | E,
-    WhileStmt -> Nalika ( Condition ) { Stmt },
-    ForStmt -> Kanggo ( Condition ; Condition ; Condition ) { Stmt },
+    IfStmt -> yen ( Condition ) { Stmt } IfStmtRest,
+    IfStmtRest -> liyane { Stmt } | E,
+    WhileStmt -> nalika ( Condition ) CpdStmt,
+    ForStmt -> kanggo ( Condition ; Condition ; Condition ) CpdStmt,
     ExpressionRest -> comparison_operator Term ExpressionRest | E,
     Term -> bool_cstnt | string_cstnt | int_cstnt | identifier,
-    IOStmt -> Maca identifier ; | Nulis identifier ;,
-    comparison_operator -> < | > | <= | >= | ==
+    IOStmt -> maca identifier ; | nulis identifier ;,
+    comparison_operator -> < | > | <= | >= | == | *
 }
