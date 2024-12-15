@@ -166,6 +166,7 @@ class Parser:
                 a = stack[0]
                 if (a, x) not in self.table.keys():
                     print("Error: no entry in parsing table for pair", (a, x))
+                    print(self.table.keys())
                     return None
                 else:
                     stack.pop(0)

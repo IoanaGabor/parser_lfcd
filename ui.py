@@ -17,6 +17,8 @@ class UI:
                 self.evaluateG1()
             elif cmd == "g2":
                 self.evaluateG2()
+            elif cmd == "g2pif":
+                self.evaluateG2WithPif()
             elif cmd == "g3":
                 self.evaluateG3()
 
@@ -38,6 +40,13 @@ class UI:
             for line in fin.readlines():
                 sequence += line.strip() + " "
         return sequence.strip()
+
+    def readPif(self, fname):
+        pif = ""
+        with open(fname, 'r') as fin:
+            for line in fin.readlines():
+                pif += line.strip().split(' ')[0].lower() + " "
+        return pif.strip()
 
     def evaluateG1(self):
         self.readG1()
@@ -71,6 +80,24 @@ class UI:
             t = Tree(self.g2)
             t.build(result.strip().split(' '))
             t.print_table()
+
+    def evaluateG2WithPif(self):
+        self.readG2()
+        self.p2 = Parser(self.g2)
+        print(self.p2.first_set)
+        print(self.p2.follow_set)
+        for k in self.p2.table.keys():
+            print(k, '->', self.p2.table[k])
+        result = self.p2.evaluate_sequence(self.readPif('pif2.out'))
+        if result is None:
+            print("Sequence not accepted")
+        else:
+            print(result)
+            t = Tree(self.g2)
+            t.build(result.strip().split(' '))
+            t.print_table()
+
+
 
     def evaluateG3(self):
         self.readG3()
